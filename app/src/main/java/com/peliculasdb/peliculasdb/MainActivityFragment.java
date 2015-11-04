@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.Inflater;
+
+import retrofit.Retrofit;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -26,6 +30,8 @@ public class MainActivityFragment extends Fragment {
     private ArrayList items;
     private ArrayAdapter <String> adapter;
     private ListView lv1;
+    final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
+    //FULL LINK POPULARS    http://api.themoviedb.org/3/movie/popular?api_key=4edd4e0c15c3af85bfd477a502187a00
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +65,9 @@ public class MainActivityFragment extends Fragment {
 
     }
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        inflater.inflate(R.menu.menu_fragment, menu);
     }
 
     @Override
@@ -73,10 +78,17 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_refresh) {
+            adapter.clear();
+            refresh();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void refresh ()
+    {
+
     }
 }
