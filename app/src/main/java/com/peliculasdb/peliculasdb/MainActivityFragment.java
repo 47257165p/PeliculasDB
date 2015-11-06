@@ -1,5 +1,7 @@
 package com.peliculasdb.peliculasdb;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,7 +30,7 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
     private ArrayList items;
-    private ArrayAdapter <String> adapter;
+    private static ArrayAdapter <String> adapter;
     private ListView lv1;
     final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
     //FULL LINK POPULARS    http://api.themoviedb.org/3/movie/popular?api_key=4edd4e0c15c3af85bfd477a502187a00
@@ -87,8 +89,18 @@ public class MainActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void refresh ()
+    public void refresh ()
     {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
+        PeliculasDBController pdb= new PeliculasDBController();
+        if (preferences.getString("listaPeliculas", "0").equals("0"))
+        {
+            pdb.updatePeliculasDBPopulares(adapter);
+        }
+        else if (preferences.getString("listaPeliculas", "0").equals("1"))
+        {
+
+        }
     }
 }
