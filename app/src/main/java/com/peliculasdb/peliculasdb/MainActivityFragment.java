@@ -96,11 +96,11 @@ public class MainActivityFragment extends Fragment {
         PeliculasDBController pdb= new PeliculasDBController();
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
-            pdb.updatePeliculasDBPopulares(adapter);
+            pdb.updatePeliculasDB(adapter, 0);
         }
         else if (preferences.getString("listaPeliculas", "0").equals("1"))
         {
-
+            pdb.updatePeliculasDB(adapter, 1);
         }
     }
 }

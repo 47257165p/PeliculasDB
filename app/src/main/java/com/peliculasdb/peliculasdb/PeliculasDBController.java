@@ -26,6 +26,9 @@ interface PeliculasDBService {
     @GET("popular")
     Call<ApiResult> peliculasPopulares(
             @Query("api_key") String api_key);
+    @GET("top_rated")
+    Call<ApiResult> peliculasValoradas(
+            @Query("api_key") String api_key);
 }
 
 public class PeliculasDBController {
@@ -46,8 +49,22 @@ public class PeliculasDBController {
         service = retrofit.create(PeliculasDBService.class);
     }
 
-    public void updatePeliculasDBPopulares(final ArrayAdapter<String> adapter) {
-        Call<ApiResult> call = service.peliculasPopulares(API_KEY);
+    public void updatePeliculasDB(final ArrayAdapter<String> adapter, int opcion) {
+
+        Call<ApiResult> call;
+
+        switch (opcion)
+        {
+            case 0:
+                call = service.peliculasPopulares(API_KEY);
+                break;
+            case 1:
+                call = service.peliculasValoradas(API_KEY);
+                break;
+            default:
+                call = service.peliculasPopulares(API_KEY);
+                break;
+        }
         call.enqueue(new Callback<ApiResult>() {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB)
             @Override
@@ -69,7 +86,6 @@ public class PeliculasDBController {
                     }
                 }
             }
-
             @Override
             public void onFailure(Throwable throwable) {
                 throwable.printStackTrace();
