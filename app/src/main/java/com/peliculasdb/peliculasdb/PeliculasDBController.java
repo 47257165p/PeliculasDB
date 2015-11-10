@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.peliculasdb.peliculasdb.json.ApiResult;
+import com.peliculasdb.peliculasdb.json.Result;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +50,8 @@ public class PeliculasDBController {
         service = retrofit.create(PeliculasDBService.class);
     }
 
-    public void updatePeliculasDB(final ArrayAdapter<String> adapter, int opcion) {
+    //Según la opción introducida nos crea un servicio de películas populares o un servicio de películas más valoradas
+    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, int opcion) {
 
         Call<ApiResult> call;
 
@@ -68,15 +70,16 @@ public class PeliculasDBController {
         call.enqueue(new Callback<ApiResult>() {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB)
             @Override
+
+            //En caso de recibir respuesta nos hará el siguiente método
             public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
+
+                //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
                 if (response.isSuccess()){
                     ApiResult result = response.body();
                     ArrayList<String> peliculasStrings = new ArrayList<>();
 
-                    for (int i = 0; i < result.getResults().size(); i++) {
-                        peliculasStrings.add(result.getResults().get(i).getTitle());
-                    }
-                    adapter.addAll(peliculasStrings);
+                    adapter.addAll(result.getResults());
                 }
                 else {
                     try {
@@ -86,6 +89,7 @@ public class PeliculasDBController {
                     }
                 }
             }
+            //En caso de fallar la llamada por cualquier motivo (falta de internet, permisos, etc) nos ejecutará el siguiente método
             @Override
             public void onFailure(Throwable throwable) {
                 throwable.printStackTrace();

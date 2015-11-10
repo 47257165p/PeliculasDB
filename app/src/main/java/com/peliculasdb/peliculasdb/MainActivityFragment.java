@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.peliculasdb.peliculasdb.json.Result;
+
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +31,8 @@ public class MainActivityFragment extends Fragment {
 
     public MainActivityFragment() {
     }
-    private ArrayList items;
-    private static ArrayAdapter <String> adapter;
+    private ArrayList<Result> items;
+    private PeliculasDBAdapter adapter;
     private ListView lv1;
     final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
     //FULL LINK POPULARS    http://api.themoviedb.org/3/movie/popular?api_key=4edd4e0c15c3af85bfd477a502187a00
@@ -39,6 +41,11 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+    public void onStart()
+    {
+        super.onStart();
+        refresh();
     }
 
     @Override
@@ -51,14 +58,12 @@ public class MainActivityFragment extends Fragment {
         //Sincronizando la listView mediante el fragment.
         lv1 = (ListView) rootView.findViewById(R.id.lv1);
 
-        String [] defecto = {"Película por defecto 1", "Película por defecto 2", "Película por defecto 3", "Película por defecto 4", "Película por defecto 5", "Película por defecto 6"};
 
         //Insserción del String anterior dentro del ArrayList de items
-        items = new ArrayList(Arrays.asList(defecto));
+        items = new ArrayList(Arrays.asList());
 
         //Creación del adapter mediante el ArrayList de items
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
-
+        adapter = new PeliculasDBAdapter(getContext(), 0, items);
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
         lv1.setAdapter(adapter);
 
@@ -91,6 +96,7 @@ public class MainActivityFragment extends Fragment {
 
     public void refresh ()
     {
+        //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         PeliculasDBController pdb= new PeliculasDBController();
