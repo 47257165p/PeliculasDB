@@ -1,5 +1,6 @@
 package com.peliculasdb.peliculasdb;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -66,6 +68,21 @@ public class MainActivityFragment extends Fragment {
         adapter = new PeliculasDBAdapter(getContext(), 0, items);
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
         lv1.setAdapter(adapter);
+
+
+        //A continuación tenemos un método que, al clicar en un objeto del Listview, nos abre una nueva activity que nos muestra dos detalles
+        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+
+                //Creamos un objeto de tipo Result para poder pasárselo como información extra a la activity
+                Result pelicula = (Result) parent.getItemAtPosition(position);
+                Intent detail = new Intent(getContext(), DetailActivity.class);
+                detail.putExtra("pelicula", pelicula);
+                startActivity(detail);
+            }
+        });
 
         //Finalmente se hace un return del rootview para la actualización de la actividad.
         return rootView;
