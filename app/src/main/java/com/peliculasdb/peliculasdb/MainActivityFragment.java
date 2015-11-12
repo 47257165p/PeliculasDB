@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,7 +36,7 @@ public class MainActivityFragment extends Fragment {
     }
     private ArrayList<Result> items;
     private PeliculasDBAdapter adapter;
-    private ListView lv1;
+    private GridView gVMain;
     final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
     //FULL LINK POPULARS    http://api.themoviedb.org/3/movie/popular?api_key=4edd4e0c15c3af85bfd477a502187a00
 
@@ -47,7 +48,7 @@ public class MainActivityFragment extends Fragment {
     public void onStart()
     {
         super.onStart();
-        refresh();
+        //refresh();
     }
 
     @Override
@@ -58,7 +59,7 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Sincronizando la listView mediante el fragment.
-        lv1 = (ListView) rootView.findViewById(R.id.lv1);
+        gVMain = (GridView) rootView.findViewById(R.id.gVMain);
 
 
         //Insserción del String anterior dentro del ArrayList de items
@@ -67,11 +68,11 @@ public class MainActivityFragment extends Fragment {
         //Creación del adapter mediante el ArrayList de items
         adapter = new PeliculasDBAdapter(getContext(), 0, items);
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
-        lv1.setAdapter(adapter);
+        gVMain.setAdapter(adapter);
 
 
         //A continuación tenemos un método que, al clicar en un objeto del Listview, nos abre una nueva activity que nos muestra dos detalles
-        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gVMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -104,18 +105,34 @@ public class MainActivityFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             adapter.clear();
+            //refresh();
+            return true;
+        }
+        /*if (id == R.id.action_populares) {
+            SharedPreferences.Editor spe = preferences.edit();
+            spe.putInt("listaPeliculas", 0);
+            spe.commit();
+            adapter.clear();
             refresh();
             return true;
         }
+        if (id == R.id.action_most_rated) {
+            SharedPreferences.Editor spe = preferences.edit();
+            spe.putInt("listaPeliculas", 1);
+            spe.commit();
+            adapter.clear();
+            refresh();
+            return true;
+        }
+        */
 
         return super.onOptionsItemSelected(item);
     }
-
+/*
     public void refresh ()
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
         PeliculasDBController pdb= new PeliculasDBController();
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
@@ -126,4 +143,5 @@ public class MainActivityFragment extends Fragment {
             pdb.updatePeliculasDB(adapter, 1);
         }
     }
+    */
 }

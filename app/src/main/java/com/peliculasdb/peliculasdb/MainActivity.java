@@ -1,7 +1,9 @@
 package com.peliculasdb.peliculasdb;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +18,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+    }
+    public void onStart()
+    {
+        super.onStart();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (preferences.getString("listaPeliculas", "0").equals("0")) {
+            toolbar.setTitle("Populares");
+        }
+        else if (preferences.getString("listaPeliculas", "0").equals("1"))
+        {
+            toolbar.setTitle("Mejor Valoradas");
+        }
         setSupportActionBar(toolbar);
 
     }
@@ -44,14 +59,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(x);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
-/*
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
- */

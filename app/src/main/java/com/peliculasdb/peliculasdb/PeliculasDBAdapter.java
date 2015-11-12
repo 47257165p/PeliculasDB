@@ -36,23 +36,17 @@ public class PeliculasDBAdapter extends ArrayAdapter<Result> {
             Result pelicula = getItem(position);
             if (convertView == null) {
                 LayoutInflater inflater = LayoutInflater.from(getContext());
-                convertView = inflater.inflate(R.layout.listview_item_layout, parent, false);
+                convertView = inflater.inflate(R.layout.gridview_item_layout, parent, false);
             }
 
             //El siguiente texto se encarga de utilizar el layout de listView_item_layout para utilizar ese formato a la hora de enseñar las imágenes
-            TextView tVTitulo = (TextView) convertView.findViewById(R.id.tVTitulo);
-            TextView tVPopularidad = (TextView) convertView.findViewById(R.id.tVPopularidad);
-            TextView tVEstreno = (TextView) convertView.findViewById(R.id.tVEstreno);
-            ImageView iVPoster = (ImageView) convertView.findViewById(R.id.iVPoster);
+            TextView tVGrid = (TextView) convertView.findViewById(R.id.tVGrid);
+            ImageView iVGrid = (ImageView) convertView.findViewById(R.id.iVGrid);
 
-            double popularidad = pelicula.getPopularity();
-            DecimalFormat two = new DecimalFormat("#.##");
-            tVTitulo.setText(pelicula.getTitle());
-            tVPopularidad.setText(two.format(popularidad)+"%");
-            tVEstreno.setText(pelicula.getReleaseDate());
+            tVGrid.setText(pelicula.getTitle());
 
             //Piscasso se encarga de extraer las imágenes de la página
-            Picasso.with(getContext()).load(POSTER_BASE_URL+POSTER_SIZE_URL+pelicula.getPosterPath()).fit().into(iVPoster);
+            Picasso.with(getContext()).load(POSTER_BASE_URL+POSTER_SIZE_URL+pelicula.getPosterPath()).fit().into(iVGrid);
             return convertView;
         }
 
