@@ -9,7 +9,6 @@ import com.peliculasdb.peliculasdb.json.ApiResult;
 import com.peliculasdb.peliculasdb.json.Result;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -26,10 +25,12 @@ interface PeliculasDBService {
 
     @GET("popular")
     Call<ApiResult> peliculasPopulares(
-            @Query("api_key") String api_key);
+            @Query("api_key") String api_key,
+            @Query("page") Integer page);
     @GET("top_rated")
     Call<ApiResult> peliculasValoradas(
-            @Query("api_key") String api_key);
+            @Query("api_key") String api_key,
+            @Query("page") Integer page);
 }
 
 public class PeliculasDBController {
@@ -38,6 +39,7 @@ public class PeliculasDBController {
     private final PeliculasDBService service;
     private final String MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private final String API_KEY = "4edd4e0c15c3af85bfd477a502187a00";
+    private int PAGE=1;
 
 
     //Objeto que nos crea el retrofit con la URL base y llama al a interfaz para rellenar con las preferencias deseadas.
@@ -51,20 +53,20 @@ public class PeliculasDBController {
     }
 
     //Según la opción introducida nos crea un servicio de películas populares o un servicio de películas más valoradas
-    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, int opcion) {
+    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, final int opcion) {
 
         Call<ApiResult> call;
 
         switch (opcion)
         {
             case 0:
-                call = service.peliculasPopulares(API_KEY);
+                call = service.peliculasPopulares(API_KEY, PAGE);
                 break;
             case 1:
-                call = service.peliculasValoradas(API_KEY);
+                call = service.peliculasValoradas(API_KEY, PAGE);
                 break;
             default:
-                call = service.peliculasPopulares(API_KEY);
+                call = service.peliculasPopulares(API_KEY, PAGE);
                 break;
         }
         call.enqueue(new Callback<ApiResult>() {
@@ -77,9 +79,12 @@ public class PeliculasDBController {
                 //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
                 if (response.isSuccess()){
                     ApiResult result = response.body();
-                    ArrayList<String> peliculasStrings = new ArrayList<>();
-
                     adapter.addAll(result.getResults());
+                    if (PAGE<3)
+                    {
+                        PAGE++;
+                        updatePeliculasDB(adapter, opcion);
+                    }
                 }
                 else {
                     try {
