@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
             toolbar.setTitle("Mejor Valoradas");
         }
         setSupportActionBar(toolbar);
-
     }
 
     @Override

@@ -2,9 +2,11 @@ package com.peliculasdb.peliculasdb;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,20 +14,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.peliculasdb.peliculasdb.json.Result;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.zip.Inflater;
-
-import retrofit.Retrofit;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,11 +28,11 @@ public class MainActivityFragment extends Fragment {
 
     public MainActivityFragment() {
     }
+    SharedPreferences preferences;
     private ArrayList<Result> items;
     private PeliculasDBAdapter adapter;
     private GridView gVMain;
     final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
-    //FULL LINK POPULARS    http://api.themoviedb.org/3/movie/popular?api_key=4edd4e0c15c3af85bfd477a502187a00
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +42,7 @@ public class MainActivityFragment extends Fragment {
     public void onStart()
     {
         super.onStart();
-        //refresh();
+        refresh();
     }
 
     @Override
@@ -108,31 +102,33 @@ public class MainActivityFragment extends Fragment {
             //refresh();
             return true;
         }
-        /*if (id == R.id.action_populares) {
+        if (id == R.id.action_populares) {
+            preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor spe = preferences.edit();
-            spe.putInt("listaPeliculas", 0);
-            spe.commit();
+            spe.putString("listaPeliculas", "0");
+            spe.apply();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
             adapter.clear();
             refresh();
             return true;
         }
         if (id == R.id.action_most_rated) {
+            preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor spe = preferences.edit();
-            spe.putInt("listaPeliculas", 1);
-            spe.commit();
+            spe.putString("listaPeliculas", "1");
+            spe.apply();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
             adapter.clear();
             refresh();
             return true;
         }
-        */
-
         return super.onOptionsItemSelected(item);
     }
-/*
+
     public void refresh ()
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         PeliculasDBController pdb= new PeliculasDBController();
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
@@ -143,5 +139,4 @@ public class MainActivityFragment extends Fragment {
             pdb.updatePeliculasDB(adapter, 1);
         }
     }
-    */
 }
