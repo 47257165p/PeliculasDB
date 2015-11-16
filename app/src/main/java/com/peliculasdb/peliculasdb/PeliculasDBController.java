@@ -9,6 +9,7 @@ import com.peliculasdb.peliculasdb.json.ApiResult;
 import com.peliculasdb.peliculasdb.json.Result;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -39,7 +40,7 @@ public class PeliculasDBController {
     private final PeliculasDBService service;
     private final String MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private final String API_KEY = "4edd4e0c15c3af85bfd477a502187a00";
-    private int PAGE=1;
+    private int page;
 
 
     //Objeto que nos crea el retrofit con la URL base y llama al a interfaz para rellenar con las preferencias deseadas.
@@ -53,20 +54,20 @@ public class PeliculasDBController {
     }
 
     //Según la opción introducida nos crea un servicio de películas populares o un servicio de películas más valoradas
-    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, final int opcion) {
+    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, int opcion, int page) {
 
         Call<ApiResult> call;
 
         switch (opcion)
         {
             case 0:
-                call = service.peliculasPopulares(API_KEY, PAGE);
+                call = service.peliculasPopulares(API_KEY, page);
                 break;
             case 1:
-                call = service.peliculasValoradas(API_KEY, PAGE);
+                call = service.peliculasValoradas(API_KEY, page);
                 break;
             default:
-                call = service.peliculasPopulares(API_KEY, PAGE);
+                call = service.peliculasPopulares(API_KEY, page);
                 break;
         }
         call.enqueue(new Callback<ApiResult>() {
@@ -80,11 +81,6 @@ public class PeliculasDBController {
                 if (response.isSuccess()){
                     ApiResult result = response.body();
                     adapter.addAll(result.getResults());
-                    if (PAGE<3)
-                    {
-                        PAGE++;
-                        updatePeliculasDB(adapter, opcion);
-                    }
                 }
                 else {
                     try {

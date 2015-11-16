@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +31,6 @@ public class MainActivityFragment extends Fragment {
     private ArrayList<Result> items;
     private PeliculasDBAdapter adapter;
     private GridView gVMain;
-    final String APIKEY = "4edd4e0c15c3af85bfd477a502187a00";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +40,14 @@ public class MainActivityFragment extends Fragment {
     public void onStart()
     {
         super.onStart();
-        refresh();
+        gVMain.setOnScrollListener(new EndlessScrollListener(1,1) {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                refresh(page);
+                return false;
+            }
+        });
+        refresh(1);
     }
 
     @Override
@@ -54,6 +59,7 @@ public class MainActivityFragment extends Fragment {
 
         //Sincronizando la listView mediante el fragment.
         gVMain = (GridView) rootView.findViewById(R.id.gVMain);
+
 
 
         //Insserción del String anterior dentro del ArrayList de items
@@ -109,7 +115,7 @@ public class MainActivityFragment extends Fragment {
             spe.apply();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
             adapter.clear();
-            refresh();
+            refresh(1);
             return true;
         }
         if (id == R.id.action_most_rated) {
@@ -119,24 +125,24 @@ public class MainActivityFragment extends Fragment {
             spe.apply();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
             adapter.clear();
-            refresh();
+            refresh(1);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void refresh ()
+    public void refresh (int page)
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         PeliculasDBController pdb= new PeliculasDBController();
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
-            pdb.updatePeliculasDB(adapter, 0);
+            pdb.updatePeliculasDB(adapter, 0, page);
         }
         else if (preferences.getString("listaPeliculas", "0").equals("1"))
         {
-            pdb.updatePeliculasDB(adapter, 1);
+            pdb.updatePeliculasDB(adapter, 1, page);
         }
     }
 }
