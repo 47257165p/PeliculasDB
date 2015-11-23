@@ -23,7 +23,6 @@ import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
 import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -36,7 +35,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
     SharedPreferences preferences;
     private GridView gVMain;
-    private PeliculasDBAdapterDB adapter;
+    private PeliculasDBAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,7 +68,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
 
         //gVMain.setAdapter(adapter);
-        adapter = new PeliculasDBAdapterDB(
+        adapter = new PeliculasDBAdapter(
                 getContext(),
                 R.layout.gridview_item_layout,
                 null,

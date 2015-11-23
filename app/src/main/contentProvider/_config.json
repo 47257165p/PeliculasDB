@@ -1,0 +1,13 @@
+{
+  "syntaxVersion": 3,
+  "projectPackageId": "com.peliculasdb.peliculasdb",
+  "authority": "com.peliculasdb.peliculasdb.provider",
+  "providerJavaPackage": "com.peliculasdb.peliculasdb.provider",
+  "providerClassName": "MovieProvider",
+  "sqliteOpenHelperClassName": "MovieSQLiteOpenHelper",
+  "sqliteOpenHelperCallbacksClassName": "MovieSQLiteOpenHelperCallbacks",
+  "databaseFileName": "movie.db",
+  "databaseVersion": 1,
+  "enableForeignKeys": true,
+  "useAnnotations": true
+}

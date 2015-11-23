@@ -1,0 +1,25 @@
+{
+  "documentation": "A movie table",
+  "fields": [
+    {
+      "name": "movie_Title",
+      "type": "String"
+    },
+    {
+      "name": "movie_Description",
+      "type": "String"
+    },
+    {
+      "name": "movie_Release",
+      "type": "String"
+    },
+    {
+      "name": "movie_Posterpath",
+      "type": "String"
+    },
+    {
+      "name": "movie_Popularity",
+      "type": "String"
+    }
+  ]
+}

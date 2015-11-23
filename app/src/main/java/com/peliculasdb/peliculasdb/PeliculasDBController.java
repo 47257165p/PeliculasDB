@@ -1,22 +1,15 @@
 package com.peliculasdb.peliculasdb;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Movie;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.ViewParent;
-import android.widget.ArrayAdapter;
 
 import com.peliculasdb.peliculasdb.json.ApiResult;
-import com.peliculasdb.peliculasdb.json.Result;
 import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
 import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import retrofit.Call;
 import retrofit.Callback;
