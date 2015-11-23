@@ -1,12 +1,19 @@
 package com.peliculasdb.peliculasdb;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Movie;
 import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 
 import com.peliculasdb.peliculasdb.json.ApiResult;
 import com.peliculasdb.peliculasdb.json.Result;
+import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
+import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,11 +47,12 @@ public class PeliculasDBController {
     private final PeliculasDBService service;
     private final String MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private final String API_KEY = "4edd4e0c15c3af85bfd477a502187a00";
-    private int page;
+    private final Context context;
 
 
     //Objeto que nos crea el retrofit con la URL base y llama al a interfaz para rellenar con las preferencias deseadas.
-    public PeliculasDBController() {
+    public PeliculasDBController(final Context context) {
+        this.context=context;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MOVIES_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -54,7 +62,7 @@ public class PeliculasDBController {
     }
 
     //Según la opción introducida nos crea un servicio de películas populares o un servicio de películas más valoradas
-    public void updatePeliculasDB(final ArrayAdapter<Result> adapter, int opcion, int page) {
+    public void updatePeliculasDB(int opcion, int page) {
 
         Call<ApiResult> call;
 
@@ -78,9 +86,20 @@ public class PeliculasDBController {
             public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
 
                 //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
-                if (response.isSuccess()){
+                if (response.isSuccess())
+                {
                     ApiResult result = response.body();
-                    adapter.addAll(result.getResults());
+
+                    for (int i = 0; i<result.getResults().size(); i++)
+                    {
+                        MovieContentValues values = new MovieContentValues();
+                        values.putMovieTitle(result.getResults().get(i).getTitle());
+                        values.putMovieDescription(result.getResults().get(i).getOverview());
+                        values.putMovieRelease(result.getResults().get(i).getReleaseDate());
+                        values.putMoviePosterpath(result.getResults().get(i).getPosterPath());
+                        values.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
+                        context.getContentResolver().insert(MovieColumns.CONTENT_URI, values.values());
+                    }
                 }
                 else {
                     try {

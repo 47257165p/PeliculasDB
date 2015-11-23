@@ -2,9 +2,12 @@ package com.peliculasdb.peliculasdb;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.peliculasdb.peliculasdb.json.Result;
+import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
+import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,14 +28,15 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private ArrayList <MovieContentValues> ArrayValues;
 
     public MainActivityFragment() {
     }
     SharedPreferences preferences;
-    private ArrayList<Result> items;
-    private PeliculasDBAdapter adapter;
     private GridView gVMain;
+    private PeliculasDBAdapterDB adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,7 +46,7 @@ public class MainActivityFragment extends Fragment {
     public void onStart()
     {
         super.onStart();
-        gVMain.setOnScrollListener(new EndlessScrollListener(1,1) {
+        gVMain.setOnScrollListener(new EndlessScrollListener(1, 1) {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 refresh(page);
@@ -60,14 +66,16 @@ public class MainActivityFragment extends Fragment {
         //Sincronizando la listView mediante el fragment.
         gVMain = (GridView) rootView.findViewById(R.id.gVMain);
 
-
-
-        //Insserción del String anterior dentro del ArrayList de items
-        items = new ArrayList(Arrays.asList());
-
-        //Creación del adapter mediante el ArrayList de items
-        adapter = new PeliculasDBAdapter(getContext(), 0, items);
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
+
+        //gVMain.setAdapter(adapter);
+        adapter = new PeliculasDBAdapterDB(
+                getContext(),
+                R.layout.gridview_item_layout,
+                null,
+                new String []{MovieColumns.MOVIE_TITLE, MovieColumns.MOVIE_POSTERPATH},
+                new int[]{R.id.tVGrid, R.id.iVGrid},
+                0);
         gVMain.setAdapter(adapter);
 
 
@@ -84,6 +92,8 @@ public class MainActivityFragment extends Fragment {
                 startActivity(detail);
             }
         });
+
+        getLoaderManager().initLoader(0, null, this);
 
         //Finalmente se hace un return del rootview para la actualización de la actividad.
         return rootView;
@@ -104,8 +114,6 @@ public class MainActivityFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            adapter.clear();
-            //refresh();
             return true;
         }
         if (id == R.id.action_populares) {
@@ -114,7 +122,6 @@ public class MainActivityFragment extends Fragment {
             spe.putString("listaPeliculas", "0");
             spe.apply();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
-            adapter.clear();
             refresh(1);
             return true;
         }
@@ -124,7 +131,6 @@ public class MainActivityFragment extends Fragment {
             spe.putString("listaPeliculas", "1");
             spe.apply();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
-            adapter.clear();
             refresh(1);
             return true;
         }
@@ -135,14 +141,34 @@ public class MainActivityFragment extends Fragment {
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        PeliculasDBController pdb= new PeliculasDBController();
+        PeliculasDBController pdb= new PeliculasDBController(getContext());
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
-            pdb.updatePeliculasDB(adapter, 0, page);
+            pdb.updatePeliculasDB(0, page);
         }
         else if (preferences.getString("listaPeliculas", "0").equals("1"))
         {
-            pdb.updatePeliculasDB(adapter, 1, page);
+            pdb.updatePeliculasDB(1, page);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new android.support.v4.content.CursorLoader(getContext(),
+                MovieColumns.CONTENT_URI,
+                null,
+                null,
+                null,
+                "_id");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }
