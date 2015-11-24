@@ -1,4 +1,4 @@
-package com.peliculasdb.peliculasdb.provider.movie;
+package com.peliculasdb.peliculasdb.provider.mejorvaloradas;
 
 import com.peliculasdb.peliculasdb.provider.base.BaseModel;
 
@@ -8,9 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * A movie table
+ * Peliculas más valoradas
  */
-public interface MovieModel extends BaseModel {
+public interface MejorvaloradasModel extends BaseModel {
 
     /**
      * Get the {@code movie_title} value.

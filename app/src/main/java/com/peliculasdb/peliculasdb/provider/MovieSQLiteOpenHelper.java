@@ -10,7 +10,8 @@ import android.os.Build;
 import android.util.Log;
 
 import com.peliculasdb.peliculasdb.BuildConfig;
-import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 
 public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = MovieSQLiteOpenHelper.class.getSimpleName();
@@ -22,14 +23,24 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
     private final MovieSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
 
     // @formatter:off
-    public static final String SQL_CREATE_TABLE_MOVIE = "CREATE TABLE IF NOT EXISTS "
-            + MovieColumns.TABLE_NAME + " ( "
-            + MovieColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + MovieColumns.MOVIE_TITLE + " TEXT, "
-            + MovieColumns.MOVIE_DESCRIPTION + " TEXT, "
-            + MovieColumns.MOVIE_RELEASE + " TEXT, "
-            + MovieColumns.MOVIE_POSTERPATH + " TEXT, "
-            + MovieColumns.MOVIE_POPULARITY + " TEXT "
+    public static final String SQL_CREATE_TABLE_MEJORVALORADAS = "CREATE TABLE IF NOT EXISTS "
+            + MejorvaloradasColumns.TABLE_NAME + " ( "
+            + MejorvaloradasColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + MejorvaloradasColumns.MOVIE_TITLE + " TEXT, "
+            + MejorvaloradasColumns.MOVIE_DESCRIPTION + " TEXT, "
+            + MejorvaloradasColumns.MOVIE_RELEASE + " TEXT, "
+            + MejorvaloradasColumns.MOVIE_POSTERPATH + " TEXT, "
+            + MejorvaloradasColumns.MOVIE_POPULARITY + " TEXT "
+            + " );";
+
+    public static final String SQL_CREATE_TABLE_POPULARES = "CREATE TABLE IF NOT EXISTS "
+            + PopularesColumns.TABLE_NAME + " ( "
+            + PopularesColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + PopularesColumns.MOVIE_TITLE + " TEXT, "
+            + PopularesColumns.MOVIE_DESCRIPTION + " TEXT, "
+            + PopularesColumns.MOVIE_RELEASE + " TEXT, "
+            + PopularesColumns.MOVIE_POSTERPATH + " TEXT, "
+            + PopularesColumns.MOVIE_POPULARITY + " TEXT "
             + " );";
 
     // @formatter:on
@@ -86,7 +97,8 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate");
         mOpenHelperCallbacks.onPreCreate(mContext, db);
-        db.execSQL(SQL_CREATE_TABLE_MOVIE);
+        db.execSQL(SQL_CREATE_TABLE_MEJORVALORADAS);
+        db.execSQL(SQL_CREATE_TABLE_POPULARES);
         mOpenHelperCallbacks.onPostCreate(mContext, db);
     }
 

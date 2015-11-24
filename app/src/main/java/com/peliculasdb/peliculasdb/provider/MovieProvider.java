@@ -7,11 +7,13 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.peliculasdb.peliculasdb.BuildConfig;
 import com.peliculasdb.peliculasdb.provider.base.BaseContentProvider;
-import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 
 public class MovieProvider extends BaseContentProvider {
     private static final String TAG = MovieProvider.class.getSimpleName();
@@ -24,16 +26,21 @@ public class MovieProvider extends BaseContentProvider {
     public static final String AUTHORITY = "com.peliculasdb.peliculasdb.provider";
     public static final String CONTENT_URI_BASE = "content://" + AUTHORITY;
 
-    private static final int URI_TYPE_MOVIE = 0;
-    private static final int URI_TYPE_MOVIE_ID = 1;
+    private static final int URI_TYPE_MEJORVALORADAS = 0;
+    private static final int URI_TYPE_MEJORVALORADAS_ID = 1;
+
+    private static final int URI_TYPE_POPULARES = 2;
+    private static final int URI_TYPE_POPULARES_ID = 3;
 
 
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        URI_MATCHER.addURI(AUTHORITY, MovieColumns.TABLE_NAME, URI_TYPE_MOVIE);
-        URI_MATCHER.addURI(AUTHORITY, MovieColumns.TABLE_NAME + "/#", URI_TYPE_MOVIE_ID);
+        URI_MATCHER.addURI(AUTHORITY, MejorvaloradasColumns.TABLE_NAME, URI_TYPE_MEJORVALORADAS);
+        URI_MATCHER.addURI(AUTHORITY, MejorvaloradasColumns.TABLE_NAME + "/#", URI_TYPE_MEJORVALORADAS_ID);
+        URI_MATCHER.addURI(AUTHORITY, PopularesColumns.TABLE_NAME, URI_TYPE_POPULARES);
+        URI_MATCHER.addURI(AUTHORITY, PopularesColumns.TABLE_NAME + "/#", URI_TYPE_POPULARES_ID);
     }
 
     @Override
@@ -50,10 +57,15 @@ public class MovieProvider extends BaseContentProvider {
     public String getType(Uri uri) {
         int match = URI_MATCHER.match(uri);
         switch (match) {
-            case URI_TYPE_MOVIE:
-                return TYPE_CURSOR_DIR + MovieColumns.TABLE_NAME;
-            case URI_TYPE_MOVIE_ID:
-                return TYPE_CURSOR_ITEM + MovieColumns.TABLE_NAME;
+            case URI_TYPE_MEJORVALORADAS:
+                return TYPE_CURSOR_DIR + MejorvaloradasColumns.TABLE_NAME;
+            case URI_TYPE_MEJORVALORADAS_ID:
+                return TYPE_CURSOR_ITEM + MejorvaloradasColumns.TABLE_NAME;
+
+            case URI_TYPE_POPULARES:
+                return TYPE_CURSOR_DIR + PopularesColumns.TABLE_NAME;
+            case URI_TYPE_POPULARES_ID:
+                return TYPE_CURSOR_ITEM + PopularesColumns.TABLE_NAME;
 
         }
         return null;
@@ -97,12 +109,20 @@ public class MovieProvider extends BaseContentProvider {
         String id = null;
         int matchedId = URI_MATCHER.match(uri);
         switch (matchedId) {
-            case URI_TYPE_MOVIE:
-            case URI_TYPE_MOVIE_ID:
-                res.table = MovieColumns.TABLE_NAME;
-                res.idColumn = MovieColumns._ID;
-                res.tablesWithJoins = MovieColumns.TABLE_NAME;
-                res.orderBy = MovieColumns.DEFAULT_ORDER;
+            case URI_TYPE_MEJORVALORADAS:
+            case URI_TYPE_MEJORVALORADAS_ID:
+                res.table = MejorvaloradasColumns.TABLE_NAME;
+                res.idColumn = MejorvaloradasColumns._ID;
+                res.tablesWithJoins = MejorvaloradasColumns.TABLE_NAME;
+                res.orderBy = MejorvaloradasColumns.DEFAULT_ORDER;
+                break;
+
+            case URI_TYPE_POPULARES:
+            case URI_TYPE_POPULARES_ID:
+                res.table = PopularesColumns.TABLE_NAME;
+                res.idColumn = PopularesColumns._ID;
+                res.tablesWithJoins = PopularesColumns.TABLE_NAME;
+                res.orderBy = PopularesColumns.DEFAULT_ORDER;
                 break;
 
             default:
@@ -110,14 +130,15 @@ public class MovieProvider extends BaseContentProvider {
         }
 
         switch (matchedId) {
-            case URI_TYPE_MOVIE_ID:
+            case URI_TYPE_MEJORVALORADAS_ID:
+            case URI_TYPE_POPULARES_ID:
                 id = uri.getLastPathSegment();
         }
         if (id != null) {
             if (selection != null) {
-                res.selection = res.table + "." + res.idColumn + "=" + id + " and (" + selection + ")";
+                res.selection = res.table + "" + res.idColumn + "=" + id + " and (" + selection + ")";
             } else {
-                res.selection = res.table + "." + res.idColumn + "=" + id;
+                res.selection = res.table + "" + res.idColumn + "=" + id;
             }
         } else {
             res.selection = selection;

@@ -1,15 +1,17 @@
-package com.peliculasdb.peliculasdb.provider.movie;
+package com.peliculasdb.peliculasdb.provider.mejorvaloradas;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
 
 import com.peliculasdb.peliculasdb.provider.MovieProvider;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 
 /**
- * A movie table
+ * Peliculas más valoradas
  */
-public class MovieColumns implements BaseColumns {
-    public static final String TABLE_NAME = "movie";
+public class MejorvaloradasColumns implements BaseColumns {
+    public static final String TABLE_NAME = "mejorvaloradas";
     public static final Uri CONTENT_URI = Uri.parse(MovieProvider.CONTENT_URI_BASE + "/" + TABLE_NAME);
 
     /**
@@ -28,7 +30,7 @@ public class MovieColumns implements BaseColumns {
     public static final String MOVIE_POPULARITY = "movie_Popularity";
 
 
-    public static final String DEFAULT_ORDER = TABLE_NAME + "." +_ID;
+    public static final String DEFAULT_ORDER = TABLE_NAME + "" +_ID;
 
     // @formatter:off
     public static final String[] ALL_COLUMNS = new String[] {
@@ -44,11 +46,11 @@ public class MovieColumns implements BaseColumns {
     public static boolean hasColumns(String[] projection) {
         if (projection == null) return true;
         for (String c : projection) {
-            if (c.equals(MOVIE_TITLE) || c.contains("." + MOVIE_TITLE)) return true;
-            if (c.equals(MOVIE_DESCRIPTION) || c.contains("." + MOVIE_DESCRIPTION)) return true;
-            if (c.equals(MOVIE_RELEASE) || c.contains("." + MOVIE_RELEASE)) return true;
-            if (c.equals(MOVIE_POSTERPATH) || c.contains("." + MOVIE_POSTERPATH)) return true;
-            if (c.equals(MOVIE_POPULARITY) || c.contains("." + MOVIE_POPULARITY)) return true;
+            if (c.equals(MOVIE_TITLE) || c.contains("" + MOVIE_TITLE)) return true;
+            if (c.equals(MOVIE_DESCRIPTION) || c.contains("" + MOVIE_DESCRIPTION)) return true;
+            if (c.equals(MOVIE_RELEASE) || c.contains("" + MOVIE_RELEASE)) return true;
+            if (c.equals(MOVIE_POSTERPATH) || c.contains("" + MOVIE_POSTERPATH)) return true;
+            if (c.equals(MOVIE_POPULARITY) || c.contains("" + MOVIE_POPULARITY)) return true;
         }
         return false;
     }

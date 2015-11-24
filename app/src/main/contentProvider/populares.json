@@ -1,5 +1,5 @@
 {
-  "documentation": "A movie table",
+  "documentation": "Peliculas populares",
   "fields": [
     {
       "name": "movie_Title",

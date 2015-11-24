@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -22,11 +22,21 @@ public class PeliculasDBAdapter extends SimpleCursorAdapter {
     final String POSTER_BASE_URL="http://image.tmdb.org/t/p/";
     final String POSTER_SIZE_URL="w185";
     final Context context;
+    String from[];
 
+
+    public String[] getFrom() {
+        return from;
+    }
+
+    public void setFrom(String[] from) {
+        this.from = from;
+    }
 
     public PeliculasDBAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
 
         super(context, layout, c, from, to, flags);
+        this.from=from;
         this.context = context;
     }
 
@@ -45,10 +55,10 @@ public class PeliculasDBAdapter extends SimpleCursorAdapter {
             TextView tVGrid = (TextView) convertView.findViewById(R.id.tVGrid);
             ImageView iVGrid = (ImageView) convertView.findViewById(R.id.iVGrid);
 
-            tVGrid.setText(movies.getString(movies.getColumnIndex(MovieColumns.MOVIE_TITLE)));
+            tVGrid.setText(movies.getString(movies.getColumnIndex(from[0])));
 
             //Piscasso se encarga de extraer las imágenes de la página
-            Picasso.with(context).load(POSTER_BASE_URL+POSTER_SIZE_URL+movies.getString(movies.getColumnIndex(MovieColumns.MOVIE_POSTERPATH))).fit().into(iVGrid);
+            Picasso.with(context).load(POSTER_BASE_URL+POSTER_SIZE_URL+movies.getString(movies.getColumnIndex(from[1]))).fit().into(iVGrid);
             return convertView;
         }
 

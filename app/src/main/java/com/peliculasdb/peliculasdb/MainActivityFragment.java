@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -19,17 +20,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.peliculasdb.peliculasdb.json.Result;
-import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
-import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
-
-import java.util.ArrayList;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private ArrayList <MovieContentValues> ArrayValues;
 
     public MainActivityFragment() {
     }
@@ -41,6 +38,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
     }
     public void onStart()
     {
@@ -52,7 +50,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 return false;
             }
         });
-        refresh(1);
     }
 
     @Override
@@ -67,14 +64,36 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         //Al listView se le pasa el adapter cuyo contenido es el arrayList de items.
 
-        //gVMain.setAdapter(adapter);
-        adapter = new PeliculasDBAdapter(
-                getContext(),
-                R.layout.gridview_item_layout,
-                null,
-                new String []{MovieColumns.MOVIE_TITLE, MovieColumns.MOVIE_POSTERPATH},
-                new int[]{R.id.tVGrid, R.id.iVGrid},
-                0);
+        if (preferences.getString("listaPeliculas", "0").equals("0"))
+        {
+            adapter = new PeliculasDBAdapter(
+                    getContext(),
+                    R.layout.gridview_item_layout,
+                    null,
+                    new String []{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH},
+                    new int[]{R.id.tVGrid, R.id.iVGrid},
+                    0);
+        }
+        else if (preferences.getString("listaPeliculas", "0").equals("1"))
+        {
+            adapter = new PeliculasDBAdapter(
+                    getContext(),
+                    R.layout.gridview_item_layout,
+                    null,
+                    new String []{MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH},
+                    new int[]{R.id.tVGrid, R.id.iVGrid},
+                    0);
+        }
+        else
+        {
+            adapter = new PeliculasDBAdapter(
+                    getContext(),
+                    R.layout.gridview_item_layout,
+                    null,
+                    new String []{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH},
+                    new int[]{R.id.tVGrid, R.id.iVGrid},
+                    0);
+        }
         gVMain.setAdapter(adapter);
 
 
@@ -120,6 +139,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "0");
             spe.apply();
+            adapter.setFrom(new String[]{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
             refresh(1);
             return true;
@@ -129,8 +149,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "1");
             spe.apply();
+            adapter.setFrom(new String[]{MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
             refresh(1);
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -139,22 +161,34 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void refresh (int page)
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
-        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         PeliculasDBController pdb= new PeliculasDBController(getContext());
-        if (preferences.getString("listaPeliculas", "0").equals("0"))
-        {
-            pdb.updatePeliculasDB(0, page);
-        }
-        else if (preferences.getString("listaPeliculas", "0").equals("1"))
-        {
-            pdb.updatePeliculasDB(1, page);
-        }
+        onLoaderReset(new CursorLoader(getContext()));
+        pdb.updatePeliculasDB(page);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (preferences.getString("listaPeliculas", "0").equals("0"))
+        {
+            return new android.support.v4.content.CursorLoader(getContext(),
+                    PopularesColumns.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    "_id");
+        }
+        else if (preferences.getString("listaPeliculas", "0").equals("1"))
+        {
+            return new android.support.v4.content.CursorLoader(getContext(),
+                    MejorvaloradasColumns.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    "_id");
+        }
         return new android.support.v4.content.CursorLoader(getContext(),
-                MovieColumns.CONTENT_URI,
+                PopularesColumns.CONTENT_URI,
                 null,
                 null,
                 null,

@@ -6,8 +6,10 @@ import android.os.Build;
 import android.util.Log;
 
 import com.peliculasdb.peliculasdb.json.ApiResult;
-import com.peliculasdb.peliculasdb.provider.movie.MovieColumns;
-import com.peliculasdb.peliculasdb.provider.movie.MovieContentValues;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasContentValues;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesContentValues;
 
 import java.io.IOException;
 
@@ -55,26 +57,14 @@ public class PeliculasDBController {
     }
 
     //Según la opción introducida nos crea un servicio de películas populares o un servicio de películas más valoradas
-    public void updatePeliculasDB(int opcion, int page) {
+    public void updatePeliculasDB(int page) {
 
         Call<ApiResult> call;
+        call = service.peliculasValoradas(API_KEY, page);
 
-        switch (opcion)
-        {
-            case 0:
-                call = service.peliculasPopulares(API_KEY, page);
-                break;
-            case 1:
-                call = service.peliculasValoradas(API_KEY, page);
-                break;
-            default:
-                call = service.peliculasPopulares(API_KEY, page);
-                break;
-        }
         call.enqueue(new Callback<ApiResult>() {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB)
             @Override
-
             //En caso de recibir respuesta nos hará el siguiente método
             public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
 
@@ -85,13 +75,51 @@ public class PeliculasDBController {
 
                     for (int i = 0; i<result.getResults().size(); i++)
                     {
-                        MovieContentValues values = new MovieContentValues();
-                        values.putMovieTitle(result.getResults().get(i).getTitle());
-                        values.putMovieDescription(result.getResults().get(i).getOverview());
-                        values.putMovieRelease(result.getResults().get(i).getReleaseDate());
-                        values.putMoviePosterpath(result.getResults().get(i).getPosterPath());
-                        values.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
-                        context.getContentResolver().insert(MovieColumns.CONTENT_URI, values.values());
+                        MejorvaloradasContentValues valuesValoradas = new MejorvaloradasContentValues();
+                        valuesValoradas.putMovieTitle(result.getResults().get(i).getTitle());
+                        valuesValoradas.putMovieDescription(result.getResults().get(i).getOverview());
+                        valuesValoradas.putMovieRelease(result.getResults().get(i).getReleaseDate());
+                        valuesValoradas.putMoviePosterpath(result.getResults().get(i).getPosterPath());
+                        valuesValoradas.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
+                        context.getContentResolver().insert(MejorvaloradasColumns.CONTENT_URI, valuesValoradas.values());
+                    }
+                }
+                else {
+                    try {
+                        Log.e("Retrofit", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            //En caso de fallar la llamada por cualquier motivo (falta de internet, permisos, etc) nos ejecutará el siguiente método
+            @Override
+            public void onFailure(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        });
+        call = service.peliculasPopulares(API_KEY, page);
+
+        call.enqueue(new Callback<ApiResult>() {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+            @Override
+            //En caso de recibir respuesta nos hará el siguiente método
+            public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
+
+                //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
+                if (response.isSuccess())
+                {
+                    ApiResult result = response.body();
+
+                    for (int i = 0; i<result.getResults().size(); i++)
+                    {
+                        PopularesContentValues valuesPopulares = new PopularesContentValues();
+                        valuesPopulares.putMovieTitle(result.getResults().get(i).getTitle());
+                        valuesPopulares.putMovieDescription(result.getResults().get(i).getOverview());
+                        valuesPopulares.putMovieRelease(result.getResults().get(i).getReleaseDate());
+                        valuesPopulares.putMoviePosterpath(result.getResults().get(i).getPosterPath());
+                        valuesPopulares.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
+                        context.getContentResolver().insert(PopularesColumns.CONTENT_URI, valuesPopulares.values());
                     }
                 }
                 else {
