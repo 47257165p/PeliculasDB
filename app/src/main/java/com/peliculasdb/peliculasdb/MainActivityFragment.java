@@ -3,6 +3,7 @@ package com.peliculasdb.peliculasdb;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -162,7 +163,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         PeliculasDBController pdb= new PeliculasDBController(getContext());
-        onLoaderReset(new CursorLoader(getContext()));
         pdb.updatePeliculasDB(page);
     }
 
@@ -171,7 +171,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
-            return new android.support.v4.content.CursorLoader(getContext(),
+            return new CursorLoader(getContext(),
                     PopularesColumns.CONTENT_URI,
                     null,
                     null,
@@ -180,14 +180,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         }
         else if (preferences.getString("listaPeliculas", "0").equals("1"))
         {
-            return new android.support.v4.content.CursorLoader(getContext(),
+            return new CursorLoader(getContext(),
                     MejorvaloradasColumns.CONTENT_URI,
                     null,
                     null,
                     null,
                     "_id");
         }
-        return new android.support.v4.content.CursorLoader(getContext(),
+        return new CursorLoader(getContext(),
                 PopularesColumns.CONTENT_URI,
                 null,
                 null,
@@ -204,4 +204,5 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
     }
+
 }

@@ -2,6 +2,7 @@ package com.peliculasdb.peliculasdb;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,10 @@ public class PeliculasDBAdapter extends SimpleCursorAdapter {
 
 
     //La siguiente URL es la url en la que se encuentran los posters de las películas que queremos, cuyo path extraeremos de la clase Result.
-    final String POSTER_BASE_URL="http://image.tmdb.org/t/p/";
-    final String POSTER_SIZE_URL="w185";
-    final Context context;
-    String from[];
+    final private String POSTER_BASE_URL="http://image.tmdb.org/t/p/";
+    final private String POSTER_SIZE_URL="w185";
+    final private Context context;
+    private String from[];
 
 
     public String[] getFrom() {
