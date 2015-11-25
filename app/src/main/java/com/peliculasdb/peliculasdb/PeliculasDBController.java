@@ -2,10 +2,12 @@ package com.peliculasdb.peliculasdb;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
 import com.peliculasdb.peliculasdb.json.ApiResult;
+import com.peliculasdb.peliculasdb.json.Result;
 import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
 import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasContentValues;
 import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
@@ -36,7 +38,7 @@ interface PeliculasDBService {
             @Query("page") Integer page);
 }
 
-public class PeliculasDBController {
+public class PeliculasDBController extends AsyncTask {
 
     //Atributos necesarios para este objeto
     private final PeliculasDBService service;
@@ -47,7 +49,7 @@ public class PeliculasDBController {
 
     //Objeto que nos crea el retrofit con la URL base y llama al a interfaz para rellenar con las preferencias deseadas.
     public PeliculasDBController(final Context context) {
-        this.context=context;
+        this.context = context;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(MOVIES_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -69,12 +71,10 @@ public class PeliculasDBController {
             public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
 
                 //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
-                if (response.isSuccess())
-                {
+                if (response.isSuccess()) {
                     ApiResult result = response.body();
 
-                    for (int i = 0; i<result.getResults().size(); i++)
-                    {
+                    for (int i = 0; i < result.getResults().size(); i++) {
                         MejorvaloradasContentValues valuesValoradas = new MejorvaloradasContentValues();
                         valuesValoradas.putMovieTitle(result.getResults().get(i).getTitle());
                         valuesValoradas.putMovieDescription(result.getResults().get(i).getOverview());
@@ -83,8 +83,7 @@ public class PeliculasDBController {
                         valuesValoradas.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
                         context.getContentResolver().insert(MejorvaloradasColumns.CONTENT_URI, valuesValoradas.values());
                     }
-                }
-                else {
+                } else {
                     try {
                         Log.e("Retrofit", response.errorBody().string());
                     } catch (IOException e) {
@@ -92,6 +91,7 @@ public class PeliculasDBController {
                     }
                 }
             }
+
             //En caso de fallar la llamada por cualquier motivo (falta de internet, permisos, etc) nos ejecutará el siguiente método
             @Override
             public void onFailure(Throwable throwable) {
@@ -107,12 +107,10 @@ public class PeliculasDBController {
             public void onResponse(Response<ApiResult> response, Retrofit retrofit) {
 
                 //Imoprtante. En caso de recibir respuesta, el succés nos comprobará que haya sido una respuesta válida
-                if (response.isSuccess())
-                {
+                if (response.isSuccess()) {
                     ApiResult result = response.body();
 
-                    for (int i = 0; i<result.getResults().size(); i++)
-                    {
+                    for (int i = 0; i < result.getResults().size(); i++) {
                         PopularesContentValues valuesPopulares = new PopularesContentValues();
                         valuesPopulares.putMovieTitle(result.getResults().get(i).getTitle());
                         valuesPopulares.putMovieDescription(result.getResults().get(i).getOverview());
@@ -121,8 +119,7 @@ public class PeliculasDBController {
                         valuesPopulares.putMoviePopularity(String.valueOf(result.getResults().get(i).getPopularity()));
                         context.getContentResolver().insert(PopularesColumns.CONTENT_URI, valuesPopulares.values());
                     }
-                }
-                else {
+                } else {
                     try {
                         Log.e("Retrofit", response.errorBody().string());
                     } catch (IOException e) {
@@ -130,11 +127,56 @@ public class PeliculasDBController {
                     }
                 }
             }
+
             //En caso de fallar la llamada por cualquier motivo (falta de internet, permisos, etc) nos ejecutará el siguiente método
             @Override
             public void onFailure(Throwable throwable) {
                 throwable.printStackTrace();
             }
         });
+    }
+
+    @Override
+    protected Object doInBackground(Object[] params) {
+        int page = (Integer) params[0];
+        Call<ApiResult> callPopulares = service.peliculasPopulares(API_KEY, page);
+        Call<ApiResult> callValoradas = service.peliculasValoradas(API_KEY, page);
+
+        try {
+
+            Response<ApiResult> responsePopulares = callPopulares.execute();
+            Response<ApiResult> responseValoradas = callValoradas.execute();
+
+
+            if (responsePopulares.isSuccess() && responseValoradas.isSuccess()) {
+                ApiResult resultPopulares = responsePopulares.body();
+                ApiResult resultValoradas = responseValoradas.body();
+
+                for (Result result : resultPopulares.getResults()) {
+                    PopularesContentValues valuesPopulares = new PopularesContentValues();
+                    valuesPopulares.putMovieTitle(result.getTitle());
+                    valuesPopulares.putMovieDescription(result.getOverview());
+                    valuesPopulares.putMovieRelease(result.getReleaseDate());
+                    valuesPopulares.putMoviePosterpath(result.getPosterPath());
+                    valuesPopulares.putMoviePopularity(String.valueOf(result.getPopularity()));
+                    context.getContentResolver().insert(PopularesColumns.CONTENT_URI, valuesPopulares.values());
+                }
+                for (Result result : resultValoradas.getResults()) {
+                    MejorvaloradasContentValues valuesValoradas = new MejorvaloradasContentValues();
+                    valuesValoradas.putMovieTitle(result.getTitle());
+                    valuesValoradas.putMovieDescription(result.getOverview());
+                    valuesValoradas.putMovieRelease(result.getReleaseDate());
+                    valuesValoradas.putMoviePosterpath(result.getPosterPath());
+                    valuesValoradas.putMoviePopularity(String.valueOf(result.getPopularity()));
+                    context.getContentResolver().insert(MejorvaloradasColumns.CONTENT_URI, valuesValoradas.values());
+                }
+
+            } else {
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

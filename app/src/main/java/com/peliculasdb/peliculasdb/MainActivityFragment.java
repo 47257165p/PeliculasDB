@@ -60,6 +60,16 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+        boolean primer_arranque = preferences.getBoolean(getString(R.string.primer_arranque), true);
+
+
+        if (primer_arranque){
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(getString(R.string.primer_arranque), false);
+            refresh(1);
+        }
+
         //Creación de la vista del fragment.
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -134,6 +144,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
+            refresh(1);
             return true;
         }
         if (id == R.id.action_populares) {
@@ -141,10 +152,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "0");
             spe.apply();
-            adapter.setFrom(new String [] {PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String[]{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
             getLoaderManager().restartLoader(0, null, this);
-            refresh(1);
             return true;
         }
         if (id == R.id.action_most_rated) {
@@ -152,11 +162,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "1");
             spe.apply();
-            adapter.setFrom(new String[] {MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String[]{MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
             getLoaderManager().restartLoader(0, null, this);
-            refresh(1);
-
             return true;
         }
         return super.onOptionsItemSelected(item);
