@@ -70,7 +70,7 @@ public class MovieSQLiteOpenHelper extends SQLiteOpenHelper {
         return new MovieSQLiteOpenHelper(context);
     }
 
-    private MovieSQLiteOpenHelper(Context context) {
+    public MovieSQLiteOpenHelper(Context context) {
         super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
         mContext = context;
         mOpenHelperCallbacks = new MovieSQLiteOpenHelperCallbacks();

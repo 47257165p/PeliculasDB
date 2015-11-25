@@ -21,8 +21,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.peliculasdb.peliculasdb.json.Result;
+import com.peliculasdb.peliculasdb.provider.MovieSQLiteOpenHelper;
 import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
 import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
+
+import java.security.Provider;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,13 +47,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void onStart()
     {
         super.onStart();
-        gVMain.setOnScrollListener(new EndlessScrollListener(1, 1) {
+        /*gVMain.setOnScrollListener(new EndlessScrollListener(1, 1) {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 refresh(page);
                 return false;
             }
-        });
+        });*/
     }
 
     @Override
@@ -101,8 +104,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         //A continuación tenemos un método que, al clicar en un objeto del Listview, nos abre una nueva activity que nos muestra dos detalles
         gVMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 //Creamos un objeto de tipo Result para poder pasárselo como información extra a la activity
                 Result pelicula = (Result) parent.getItemAtPosition(position);
@@ -111,7 +113,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                 startActivity(detail);
             }
         });
-
         getLoaderManager().initLoader(0, null, this);
 
         //Finalmente se hace un return del rootview para la actualización de la actividad.
@@ -140,8 +141,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "0");
             spe.apply();
-            adapter.setFrom(new String[]{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String [] {PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
+            getLoaderManager().restartLoader(0, null, this);
             refresh(1);
             return true;
         }
@@ -150,8 +152,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "1");
             spe.apply();
-            adapter.setFrom(new String[]{MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String[] {MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
+            getLoaderManager().restartLoader(0, null, this);
             refresh(1);
 
             return true;
@@ -163,6 +166,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     {
         //El siguiente texto se utiliza para coger las preferencias de la aplicación y poder utilizarlas.
         PeliculasDBController pdb= new PeliculasDBController(getContext());
+        SQLiteDatabase database;
+        MovieSQLiteOpenHelper dbHelper =  new MovieSQLiteOpenHelper(getContext());
+        database = dbHelper.getWritableDatabase();
+        database.delete("populares", null, null);
+        database.delete("mejorvaloradas", null, null);
+
         pdb.updatePeliculasDB(page);
     }
 
