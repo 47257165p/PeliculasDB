@@ -1,5 +1,8 @@
 package com.peliculasdb.peliculasdb;
 
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.peliculasdb.peliculasdb.json.Result;
+import com.peliculasdb.peliculasdb.provider.mejorvaloradas.MejorvaloradasColumns;
+import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -31,28 +36,50 @@ public class DetailActivityFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View fragment2 = inflater.inflate(R.layout.fragment_detail, container, false);
-        Result pelicula = (Result) getActivity().getIntent().getExtras().get("pelicula");
-
+        View detailFragment = inflater.inflate(R.layout.fragment_detail, container, false);
         //Refereniamos los datos con el layout
-        detailTitulo = (TextView) fragment2.findViewById(R.id.detailTitulo);
-        detailPuntuacion = (TextView) fragment2.findViewById(R.id.detailPuntuacion);
-        detailFecha = (TextView) fragment2.findViewById(R.id.detailFecha);
-        detailDescripcion = (TextView) fragment2.findViewById(R.id.detailDescripcion);
-        detailPoster = (ImageView) fragment2.findViewById(R.id.detailPoster);
+        detailTitulo = (TextView) detailFragment.findViewById(R.id.detailTitulo);
+        detailPuntuacion = (TextView) detailFragment.findViewById(R.id.detailPuntuacion);
+        detailFecha = (TextView) detailFragment.findViewById(R.id.detailFecha);
+        detailDescripcion = (TextView) detailFragment.findViewById(R.id.detailDescripcion);
+        detailPoster = (ImageView) detailFragment.findViewById(R.id.detailPoster);
 
-        //utilizamos el objeto Result que habíamos enviado para extraer la información que queremos
-        detailTitulo.setText("Título"+"\n"+pelicula.getTitle());
-        detailPuntuacion.setText("Puntuación"+"\n"+ new DecimalFormat("#.##").format(pelicula.getPopularity()).toString()+"%");
-        detailFecha.setText("Estreno"+"\n"+pelicula.getReleaseDate());
-        detailDescripcion.setText("Descripción"+"\n"+pelicula.getOverview());
 
-        //Finalmente utilizamos picasso para recuperar la información de los posters a través de la URL arriba definida.
-        Picasso.with(getContext()).load(POSTER_BASE_URL + POSTER_SIZE_URL + pelicula.getPosterPath()).fit().into(detailPoster);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        long id = getActivity().getIntent().getLongExtra("id", -1);
 
-        return fragment2;
+        if (preferences.getString("listaPeliculas", "0").equals("0"))
+        {
+            Cursor cursor = getContext().getContentResolver().query(
+                    PopularesColumns.CONTENT_URI,
+                    null,
+                    PopularesColumns._ID + " =?",
+                    new String[]{String.valueOf(id)},
+                    "_id");
+            cursor.moveToNext();
+            detailTitulo.setText(cursor.getString(cursor.getColumnIndex(PopularesColumns.MOVIE_TITLE)));
+            detailPuntuacion.setText(cursor.getString(cursor.getColumnIndex(PopularesColumns.MOVIE_POPULARITY)));
+            detailFecha.setText(cursor.getString(cursor.getColumnIndex(PopularesColumns.MOVIE_RELEASE)));
+            detailDescripcion.setText(cursor.getString(cursor.getColumnIndex(PopularesColumns.MOVIE_DESCRIPTION)));
+            Picasso.with(getContext()).load(POSTER_BASE_URL + POSTER_SIZE_URL + cursor.getString(cursor.getColumnIndex(PopularesColumns.MOVIE_POSTERPATH))).fit().into(detailPoster);
+        }
+        else if (preferences.getString("listaPeliculas", "0").equals("1"))
+        {
+            Cursor cursor = getContext().getContentResolver().query(
+                    MejorvaloradasColumns.CONTENT_URI,
+                    null,
+                    MejorvaloradasColumns._ID + " =?",
+                    new String[]{String.valueOf(id)},
+                    "_id");
+            cursor.moveToNext();
+            detailTitulo.setText(cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_TITLE)));
+            detailPuntuacion.setText(cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_POPULARITY)));
+            detailFecha.setText(cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_RELEASE)));
+            detailDescripcion.setText(cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_DESCRIPTION)));
+            Picasso.with(getContext()).load(POSTER_BASE_URL + POSTER_SIZE_URL + cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_POSTERPATH))).fit().into(detailPoster);
+        }
+        return detailFragment;
     }
 }

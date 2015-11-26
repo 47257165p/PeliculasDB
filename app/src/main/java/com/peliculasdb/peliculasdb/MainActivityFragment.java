@@ -104,20 +104,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         gVMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if (preferences.getString("listaPeliculas", "0").equals("0"))
-                {
-
-                }
-                else if (preferences.getString("listaPeliculas", "0").equals("1"))
-                {
-
-                }
-                //Creamos un objeto de tipo Result para poder pasárselo como información extra a la activity
-                Result pelicula = (Result) parent.getItemAtPosition(position);
                 Intent detail = new Intent(getContext(), DetailActivity.class);
-                detail.putExtra("pelicula", pelicula);
+                detail.putExtra("id", id);
                 startActivity(detail);
             }
         });
