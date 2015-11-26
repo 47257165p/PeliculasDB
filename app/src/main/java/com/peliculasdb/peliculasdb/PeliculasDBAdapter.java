@@ -2,7 +2,6 @@ package com.peliculasdb.peliculasdb;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.peliculasdb.peliculasdb.provider.populares.PopularesColumns;
 import com.squareup.picasso.Picasso;
 
 /**

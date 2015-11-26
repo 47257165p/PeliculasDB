@@ -60,6 +60,16 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+        boolean primer_arranque = preferences.getBoolean(getString(R.string.primer_arranque), true);
+
+
+        if (primer_arranque){
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(getString(R.string.primer_arranque), false);
+            refresh(1);
+        }
+
         //Creación de la vista del fragment.
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -88,24 +98,22 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                     new int[]{R.id.tVGrid, R.id.iVGrid},
                     0);
         }
-        else
-        {
-            adapter = new PeliculasDBAdapter(
-                    getContext(),
-                    R.layout.gridview_item_layout,
-                    null,
-                    new String []{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH},
-                    new int[]{R.id.tVGrid, R.id.iVGrid},
-                    0);
-        }
         gVMain.setAdapter(adapter);
-
 
         //A continuación tenemos un método que, al clicar en un objeto del Listview, nos abre una nueva activity que nos muestra dos detalles
         gVMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (preferences.getString("listaPeliculas", "0").equals("0"))
+                {
+
+                }
+                else if (preferences.getString("listaPeliculas", "0").equals("1"))
+                {
+
+                }
                 //Creamos un objeto de tipo Result para poder pasárselo como información extra a la activity
                 Result pelicula = (Result) parent.getItemAtPosition(position);
                 Intent detail = new Intent(getContext(), DetailActivity.class);
@@ -134,6 +142,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
+            refresh(1);
             return true;
         }
         if (id == R.id.action_populares) {
@@ -141,10 +150,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "0");
             spe.apply();
-            adapter.setFrom(new String [] {PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String[]{PopularesColumns.MOVIE_TITLE, PopularesColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Populares");
             getLoaderManager().restartLoader(0, null, this);
-            refresh(1);
             return true;
         }
         if (id == R.id.action_most_rated) {
@@ -152,11 +160,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             SharedPreferences.Editor spe = preferences.edit();
             spe.putString("listaPeliculas", "1");
             spe.apply();
-            adapter.setFrom(new String[] {MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
+            adapter.setFrom(new String[]{MejorvaloradasColumns.MOVIE_TITLE, MejorvaloradasColumns.MOVIE_POSTERPATH});
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Mejor Valoradas");
             getLoaderManager().restartLoader(0, null, this);
-            refresh(1);
-
             return true;
         }
         return super.onOptionsItemSelected(item);
