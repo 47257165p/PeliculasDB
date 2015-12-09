@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityFragment.onMovieSelectedListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,5 +59,23 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMovieSelected(long id)
+    {
+        boolean tablet = getResources().getBoolean(R.bool.tablet);
+        if (tablet)
+        {
+            DetailActivityFragment detailActivityFragment = (DetailActivityFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.DetailFragment);
+            detailActivityFragment.loadMovieFromActivity(id);
+        }
+        else
+        {
+            Intent detailsActivity = new Intent(this, DetailActivity.class);
+            detailsActivity.putExtra("id", id);
+            startActivity(detailsActivity);
+        }
     }
 }

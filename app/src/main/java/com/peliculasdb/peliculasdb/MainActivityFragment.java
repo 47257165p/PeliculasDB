@@ -1,5 +1,6 @@
 package com.peliculasdb.peliculasdb;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -37,6 +38,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     SharedPreferences preferences;
     private GridView gVMain;
     private PeliculasDBAdapter adapter;
+    private onMovieSelectedListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,9 +106,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         gVMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detail = new Intent(getContext(), DetailActivity.class);
-                detail.putExtra("id", id);
-                startActivity(detail);
+
+                listener.onMovieSelected(id);
             }
         });
         getLoaderManager().initLoader(0, null, this);
@@ -208,4 +209,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         adapter.swapCursor(null);
     }
 
+    public interface onMovieSelectedListener
+    {
+        void onMovieSelected(long id);
+    }
+    public void onAttach (Context context)
+    {
+        super.onAttach(context);
+        listener = (onMovieSelectedListener) context;
+    }
 }

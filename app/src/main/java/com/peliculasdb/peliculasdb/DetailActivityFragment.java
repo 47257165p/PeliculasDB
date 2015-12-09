@@ -47,8 +47,23 @@ public class DetailActivityFragment extends Fragment {
         detailPoster = (ImageView) detailFragment.findViewById(R.id.detailPoster);
 
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         long id = getActivity().getIntent().getLongExtra("id", -1);
+        if (id != -1)
+        {
+            cargarPelicula(detailFragment, id);
+        }
+
+
+        return detailFragment;
+    }
+    public void loadMovieFromActivity(Long id)
+    {
+        View view = getView();
+        cargarPelicula(view, id);
+    }
+    public void cargarPelicula(View view, long id)
+    {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         if (preferences.getString("listaPeliculas", "0").equals("0"))
         {
@@ -80,6 +95,5 @@ public class DetailActivityFragment extends Fragment {
             detailDescripcion.setText(cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_DESCRIPTION)));
             Picasso.with(getContext()).load(POSTER_BASE_URL + POSTER_SIZE_URL + cursor.getString(cursor.getColumnIndex(MejorvaloradasColumns.MOVIE_POSTERPATH))).fit().into(detailPoster);
         }
-        return detailFragment;
     }
 }
